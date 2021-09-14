@@ -4,6 +4,14 @@ metadata:
    name: datastax
 ---
 apiVersion: v1
+binaryData:
+  secure-connect-testing.zip: changeme
+kind: ConfigMap
+metadata:
+  name: secure-bundle-data
+  namespace: datastax
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: datastax-studio
@@ -35,10 +43,17 @@ spec:
     spec:
       containers:
       - name: datastax-studio
+        volumeMounts:
+        - name: secure-bundle
+          mountPath: /opt/datastax-studio/bundles
         image: datastax/dse-studio
         imagePullPolicy: IfNotPresent
         env:
         - name: DS_LICENSE
-          value: CHANGEME
+          value: accept
         ports:
         - containerPort: 9091
+      volumes:
+        - name: secure-bundle
+          configMap:
+            name: secure-bundle-data
