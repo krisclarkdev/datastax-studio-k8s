@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: datastax
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: datastax-studio
+  namespace: datastax
+spec:
+  selector:
+    app: datastax-studio
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 9091
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datastax-studio
+  namespace: datastax
+spec:
+  selector:
+    matchLabels:
+      app: datastax-studio
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: datastax-studio
+    spec:
+      containers:
+      - name: datastax-studio
+        image: datastax/dse-studio
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DS_LICENSE
+          value: CHANGEME
+        ports:
+        - containerPort: 9091
